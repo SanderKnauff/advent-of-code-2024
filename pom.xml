@@ -21,6 +21,7 @@
     <module>days/day-6</module>
     <module>days/day-7</module>
     <module>days/day-8</module>
+    <module>days/day-9</module>
   </modules>
 
   <properties>
