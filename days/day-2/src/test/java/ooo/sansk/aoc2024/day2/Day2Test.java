@@ -46,18 +46,4 @@ class Day2Test {
 
         System.out.println("The amount of safe reports is %d".formatted(result));
     }
-
-    @ParameterizedTest
-    @CsvSource({
-        "71 73 72 69 66, true",
-        "51 50 51 52 54, true",
-    })
-    void a(String reportText, boolean expected) {
-        final var report = Arrays.stream(reportText.split("\\s+")).mapToInt(Integer::parseInt).toArray();
-
-        final var result = subject.isReportSafeWithProblemsDampend(report, -1);
-
-        assertEquals(expected, result);
-
-    }
 }
