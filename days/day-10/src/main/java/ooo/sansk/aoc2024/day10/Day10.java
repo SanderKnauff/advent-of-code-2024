@@ -11,11 +11,7 @@ class Day10 {
 
         return area.trailHeads()
                 .stream()
-                .mapToInt(trailHead -> {
-                    final var trailCount = new HashSet<>(followTrail(area, trailHead, 0)).size();
-                    System.out.println("Found %s trails starting at %s".formatted(trailCount, trailHead));
-                    return trailCount;
-                })
+                .mapToInt(trailHead -> new HashSet<>(followTrail(area, trailHead, 0)).size())
                 .sum();
     }
 
@@ -24,11 +20,7 @@ class Day10 {
 
         return area.trailHeads()
                 .stream()
-                .mapToInt(trailHead -> {
-                    final var trailCount = followTrail(area, trailHead, 0).size();
-                    System.out.println("Found %s trails starting at %s".formatted(trailCount, trailHead));
-                    return trailCount;
-                })
+                .mapToInt(trailHead -> followTrail(area, trailHead, 0).size())
                 .sum();
     }
 

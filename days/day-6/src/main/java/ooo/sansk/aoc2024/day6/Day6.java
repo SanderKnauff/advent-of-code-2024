@@ -1,6 +1,5 @@
 package ooo.sansk.aoc2024.day6;
 
-import javax.swing.text.Position;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
