@@ -1,7 +1,8 @@
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-module day6aoc {
+module grid {
     requires org.jspecify;
-    requires grid;
+
+    exports ooo.sansk.aoc2024.grid;
 }

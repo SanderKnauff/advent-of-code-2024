@@ -13,6 +13,8 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>utils/grid</module>
+
     <module>days/day-1</module>
     <module>days/day-2</module>
     <module>days/day-3</module>
@@ -87,11 +89,7 @@
                 <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
                 <arg>-XDcompilePolicy=simple</arg>
                 <arg>--should-stop=ifError=FLOW</arg>
-                <arg>
-                  -Xplugin:ErrorProne \
-                  -Xep:NullAway:ERROR \
-                  -XepOpt:NullAway:AnnotatedPackages=ooo.sansk.aoc2024
-                </arg>
+                <arg>-Xplugin:ErrorProne -Xep:NullAway:ERROR -XepOpt:NullAway:AnnotatedPackages=ooo.sansk.aoc2024</arg>
               </compilerArgs>
               <annotationProcessorPaths>
                 <path>

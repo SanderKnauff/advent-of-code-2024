@@ -1,5 +1,8 @@
 package ooo.sansk.aoc2024.day6;
 
+import ooo.sansk.aoc2024.grid.Grid2d;
+import ooo.sansk.aoc2024.grid.Vec2d;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,14 +25,14 @@ class Day6 {
     private void printMap(AreaMap area, Guard guard) {
         System.out.println("-----");
         final var map = area.map();
-        for (int y = 0; y < map.length; y++) {
-            for (int x = 0; x < map.length; x++) {
-                final var cell = map[x][y];
+        for (int y = 0; y < map.height(); y++) {
+            for (int x = 0; x < map.width(); x++) {
+                final var cell = map.get(x, y);
                 char c = '.';
                 if (cell == 1) {
                     c = '#';
                 }
-                final var currentPosition = new Point(x, y);
+                final var currentPosition = new Vec2d(x, y);
                 if (guard.visited.contains(currentPosition)) {
                     c = 'X';
                 }
@@ -47,7 +50,7 @@ class Day6 {
         final var map = readMap(input);
         final var guard = new Guard(map.initialPosition(), Direction.NORTH);
 
-        Set<Point> obstructablePositions = new HashSet<>();
+        Set<Vec2d> obstructablePositions = new HashSet<>();
         while (guard.step(map).equals(StepResult.PATROLLING)) {
             final var target = guard.facing.findPointInDirection(guard.position);
             if (!map.isOccupied(target)) {
@@ -64,9 +67,9 @@ class Day6 {
     int bruteForcePartTwo(String input) {
         int amount = 0;
         final var map = readMap(input);
-        for (int y = 0; y < map.map.length; y++) {
-            for (int x = 0; x < map.map[y].length; x++) {
-                Point position = new Point(x, y);
+        for (int y = 0; y < map.map.height(); y++) {
+            for (int x = 0; x < map.map().width(); x++) {
+                Vec2d position = new Vec2d(x, y);
                 if (map.isOccupied(position)) {
                     continue;
                 }
@@ -96,11 +99,11 @@ class Day6 {
     }
 
     class Guard {
-        private Point position;
+        private Vec2d position;
         private Direction facing;
         private Set<Step> visited;
 
-        public Guard(Point initialPosition, Direction initialFacing) {
+        public Guard(Vec2d initialPosition, Direction initialFacing) {
             this.position = initialPosition;
             this.facing = initialFacing;
             this.visited = new HashSet<>();
@@ -108,14 +111,14 @@ class Day6 {
         }
 
         StepResult step(AreaMap map) {
-            Point target = this.facing.findPointInDirection(position);
+            Vec2d target = this.facing.findPointInDirection(position);
             while (map.isOccupied(target)) {
                 this.facing = this.facing.turnRight();
                 target = this.facing.findPointInDirection(position);
             }
 
             this.position = target;
-            if (position.x() < 0 || position.x() >= map.map().length || position.y() < 0 || position.y() >= map.map()[0].length) {
+            if (!map.map().isOnGrid(position.x(), position.y())) {
                 return StepResult.LEFT_AREA;
             }
             if (visited.contains(new Step(this.facing, this.position))) {
@@ -138,70 +141,67 @@ class Day6 {
     }
 
     private AreaMap readMap(String input) {
-        final var lines = input.split("\r?\n", -1);
-        final var width = lines[0].length();
-        final var height = lines.length;
+        final var grid = Grid2d.fromMultiDimensionalString(Integer.class, input, "|", text -> switch (text) {
+            case "." -> 0;
+            case "#" -> 1;
+            case "^" -> 2;
+            default -> throw new IllegalArgumentException("Map had invalid character (%s)".formatted(text));
+        });
 
-        int[][] map = new int[width][height];
-        Point initalPosition = null;
-        for (int y = 0; y < lines.length; y++) {
-            final String line = lines[y];
-            for (int x = 0; x < line.length(); x++) {
-                char c = line.charAt(x);
-                map[x][y] = switch (c) {
-                    case '.' -> 0;
-                    case '#' -> 1;
-                    case '^' -> {
-                        initalPosition = new Point(x, y);
-                        yield 0;
-                    }
-                    default -> throw new IllegalArgumentException("Map had invalid character" + c);
-                };
+        Vec2d initialPosition = null;
+        for (int x = 0; x < grid.width(); x++) {
+            for (int y = 0; y < grid.height(); y++) {
+                final var pos = grid.get(x, y);
+                if (pos.equals(2)) {
+                    initialPosition = new Vec2d(x, y);
+                    grid.set(x, y, 0);
+                    break;
+                }
             }
         }
 
-        if (initalPosition == null) {
-            throw new IllegalArgumentException("Map had no starting point");
+        if (initialPosition == null) {
+            throw new IllegalStateException("No initial position found");
         }
 
-        return new AreaMap(map, initalPosition);
+        return new AreaMap(grid, initialPosition);
     }
 
-    record AreaMap(int[][] map, Point initialPosition) {
-        AreaMap copyWithObstruction(Point obstruction) {
-            int[][] newMap = new int[this.map.length][this.map[0].length];
-            for (int y = 0; y < this.map.length; y++) {
-                newMap[y] = Arrays.copyOf(this.map[y], this.map[y].length);
+    record AreaMap(Grid2d<Integer> map, Vec2d initialPosition) {
+        AreaMap copyWithObstruction(Vec2d obstruction) {
+            Integer[][] newMap = new Integer[this.map.width()][this.map.height()];
+            for (int y = 0; y < this.map.height(); y++) {
+                for (int x = 0; x < this.map.width(); x++) {
+                    newMap[x][y] = this.map.get(x, y);
+                }
             }
 
-            if (obstruction.x() >= 0 && obstruction.x() < map.length && obstruction.y() >= 0 && obstruction.y() < map[0].length) {
+            if (obstruction.x() >= 0 && obstruction.x() < map.height() && obstruction.y() >= 0 && obstruction.y() < map.width()) {
                 newMap[obstruction.x()][obstruction.y()] = 1;
             }
-            return new AreaMap(newMap, initialPosition);
+            return new AreaMap(new Grid2d(newMap), initialPosition);
         }
 
-        private boolean isOccupied(Point position) {
-            if (position.x() < 0 || position.x() >= map.length || position.y() < 0 || position.y() >= map[0].length) {
+        private boolean isOccupied(Vec2d position) {
+            if(!map.isOnGrid(position.x(), position.y())) {
                 return false;
             }
-            return map[position.x()][position.y()] == 1;
+
+            return map.get(position.x(), position.y()) == 1;
         }
     }
 
-    record Point(int x, int y) {
-    }
-
-    record Step(Direction facing, Point position) {}
+    record Step(Direction facing, Vec2d position) {}
 
     enum Direction {
-        NORTH(point -> new Point(point.x(), point.y() - 1)),
-        EAST(point -> new Point(point.x() + 1, point.y())),
-        SOUTH(point -> new Point(point.x(), point.y() + 1)),
-        WEST(point -> new Point(point.x() - 1, point.y()));
+        NORTH(point -> new Vec2d(point.x(), point.y() - 1)),
+        EAST(point -> new Vec2d(point.x() + 1, point.y())),
+        SOUTH(point -> new Vec2d(point.x(), point.y() + 1)),
+        WEST(point -> new Vec2d(point.x() - 1, point.y()));
 
-        private final UnaryOperator<Point> nextPointFunction;
+        private final UnaryOperator<Vec2d> nextPointFunction;
 
-        Direction(UnaryOperator<Point> nextPointFunction) {
+        Direction(UnaryOperator<Vec2d> nextPointFunction) {
             this.nextPointFunction = nextPointFunction;
         }
 
@@ -210,7 +210,7 @@ class Day6 {
             return directions[(this.ordinal() + 1) % directions.length];
         }
 
-        public Point findPointInDirection(Point current) {
+        public Vec2d findPointInDirection(Vec2d current) {
             return this.nextPointFunction.apply(current);
         }
     }
