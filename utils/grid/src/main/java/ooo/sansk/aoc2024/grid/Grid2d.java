@@ -1,6 +1,9 @@
 package ooo.sansk.aoc2024.grid;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
+
+import static java.util.function.Predicate.not;
 
 /// 2d grid where each cell is of a specific type.
 /// @param <CELL_TYPE>
@@ -58,7 +61,7 @@ public class Grid2d<CELL_TYPE> {
 
         for (int cellY = 0; cellY < lines.length; cellY++) {
             final var line = lines[cellY];
-            final var cells = line.split(cellDelimiter, -1);
+            final var cells = Arrays.stream(line.split(cellDelimiter, -1)).filter(not(String::isBlank)).toArray(String[]::new);
 
             if (width == 0) {
                 width = cells.length;

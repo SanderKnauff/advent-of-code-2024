@@ -3,28 +3,28 @@ package ooo.sansk.aoc2024.grid;
 public enum Direction {
     NORTH((int x, int y, int minX, int minY, int maxX, int maxY) -> {
         final var target = new Vec2d(x, y + 1);
-        if (!Grid2d.isInBox(x, y, minX, minY, maxX, maxY)) {
+        if (!Grid2d.isInBox(target.x(), target.y(), minX, minY, maxX, maxY)) {
             return new MoveResult.OutOfBounds();
         }
         return new MoveResult.Moved(target.x(), target.y());
     }),
     EAST((int x, int y, int minX, int minY, int maxX, int maxY) -> {
         final var target = new Vec2d(x + 1, y);
-        if (!Grid2d.isInBox(x, y, minX, minY, maxX, maxY)) {
+        if (!Grid2d.isInBox(target.x(), target.y(), minX, minY, maxX, maxY)) {
             return new MoveResult.OutOfBounds();
         }
         return new MoveResult.Moved(target.x(), target.y());
     }),
     SOUTH((int x, int y, int minX, int minY, int maxX, int maxY) -> {
         final var target = new Vec2d(x, y - 1);
-        if (!Grid2d.isInBox(x, y, minX, minY, maxX, maxY)) {
+        if (!Grid2d.isInBox(target.x(), target.y(), minX, minY, maxX, maxY)) {
             return new MoveResult.OutOfBounds();
         }
         return new MoveResult.Moved(target.x(), target.y());
     }),
     WEST((int x, int y, int minX, int minY, int maxX, int maxY) -> {
         final var target = new Vec2d(x - 1, y);
-        if (!Grid2d.isInBox(x, y, minX, minY, maxX, maxY)) {
+        if (!Grid2d.isInBox(target.x(), target.y(), minX, minY, maxX, maxY)) {
             return new MoveResult.OutOfBounds();
         }
         return new MoveResult.Moved(target.x(), target.y());
