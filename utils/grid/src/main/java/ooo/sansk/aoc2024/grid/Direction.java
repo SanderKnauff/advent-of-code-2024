@@ -2,7 +2,7 @@ package ooo.sansk.aoc2024.grid;
 
 public enum Direction {
     NORTH((int x, int y, int minX, int minY, int maxX, int maxY) -> {
-        final var target = new Vec2d(x, y + 1);
+        final var target = new Vec2d(x, y - 1);
         if (!Grid2d.isInBox(target.x(), target.y(), minX, minY, maxX, maxY)) {
             return new MoveResult.OutOfBounds();
         }
@@ -16,7 +16,7 @@ public enum Direction {
         return new MoveResult.Moved(target.x(), target.y());
     }),
     SOUTH((int x, int y, int minX, int minY, int maxX, int maxY) -> {
-        final var target = new Vec2d(x, y - 1);
+        final var target = new Vec2d(x, y + 1);
         if (!Grid2d.isInBox(target.x(), target.y(), minX, minY, maxX, maxY)) {
             return new MoveResult.OutOfBounds();
         }

@@ -1,7 +1,12 @@
 package ooo.sansk.aoc2024.grid;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.function.Predicate.not;
 
@@ -20,6 +25,10 @@ public class Grid2d<CELL_TYPE> {
 
     public void set(int x, int y, CELL_TYPE value) {
         grid[x][y] = value;
+    }
+
+    public void set(Vec2d position, CELL_TYPE value) {
+        grid[position.x()][position.y()] = value;
     }
 
     public CELL_TYPE get(int x, int y) {
@@ -82,6 +91,40 @@ public class Grid2d<CELL_TYPE> {
             throw new IllegalStateException("Grid was not initialized");
         }
         return new Grid2d<>(grid);
+    }
+
+    public List<Vec2d> findAll(Predicate<CELL_TYPE> matcher) {
+        final var result = new ArrayList<Vec2d>();
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                if (matcher.test(grid[x][y])) {
+                    result.add(new Vec2d(x, y));
+                }
+            }
+        }
+        return result;
+    }
+
+    public Optional<Vec2d> findLocationOfFirst(CELL_TYPE cell) {
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                if (grid[x][y].equals(cell)) {
+                    return Optional.of(new Vec2d(x, y));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public void print(Function<CELL_TYPE,String> cellMapper) {
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                final var cell = grid[x][y];
+                final var representation = cellMapper.apply(cell);
+                System.out.print(representation);
+            }
+            System.out.println();
+        }
     }
 
     public static boolean isInBox(int x, int y, int minX, int minY, int maxX, int maxY) {
