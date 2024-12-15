@@ -1,7 +1,5 @@
 package ooo.sansk.aoc2024.day4;
 
-import org.jspecify.annotations.Nullable;
-
 import java.util.Locale;
 
 class Day4 {
