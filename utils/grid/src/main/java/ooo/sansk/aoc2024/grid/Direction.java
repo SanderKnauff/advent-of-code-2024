@@ -77,9 +77,21 @@ public enum Direction {
     }
 
     public sealed interface MoveResult {
-        record OutOfBounds() implements MoveResult {}
+        Vec2d orThrow();
+
+        record OutOfBounds() implements MoveResult {
+            @Override
+            public Vec2d orThrow() {
+                throw new IllegalArgumentException("Out of bounds");
+            }
+        }
         record Moved(int x, int y) implements MoveResult {
             public Vec2d asVector() {
+                return new Vec2d(x, y);
+            }
+
+            @Override
+            public Vec2d orThrow() {
                 return new Vec2d(x, y);
             }
         }

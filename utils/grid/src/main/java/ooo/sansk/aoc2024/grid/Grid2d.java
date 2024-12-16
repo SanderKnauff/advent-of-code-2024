@@ -47,11 +47,11 @@ public class Grid2d<CELL_TYPE> {
     }
 
     public int width() {
-        return grid[0].length;
+        return grid.length;
     }
 
     public int height() {
-        return grid.length;
+        return grid[0].length;
     }
 
     /// Reads a grid from a multiline string.
